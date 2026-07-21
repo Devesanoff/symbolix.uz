@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	delivery "github.com/Devesanoff/symbolix.uz/internal/delivery/http"
 )
@@ -20,7 +21,11 @@ func main() {
 	fs := http.FileServer(http.Dir("./web"))
 	mux.Handle("/", fs)
 
-	addr := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := ":" + port
 	log.Printf("Server starting on %s", addr)
 	log.Printf("Frontend available at http://localhost%s", addr)
 	if err := http.ListenAndServe(addr, mux); err != nil {
