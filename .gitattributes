@@ -1,0 +1,3 @@
+# HTML va web statik fayllarni statistikada hisobga olmaslik
+web/* linguist-vendored
+*.html linguist-detectable=false
