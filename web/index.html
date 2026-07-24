@@ -103,6 +103,21 @@
 
         <!-- ================= TEXT TAB ================= -->
         <div id="panel-text" class="w-full fade-enter">
+            
+            <!-- Alphabet Mode Switcher -->
+            <div id="alphabet-mode-wrapper" class="flex justify-center mb-6">
+                <div class="inline-flex p-1 bg-zinc-200/70 dark:bg-zinc-800/80 rounded-xl border border-zinc-300/60 dark:border-zinc-700/60 shadow-inner">
+                    <button id="mode-standard-btn" onclick="selectAlphabetMode('standard')" 
+                        class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-150 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm">
+                        Amaldagi alifbo (Oʻ, Gʻ, Sh, Ch)
+                    </button>
+                    <button id="mode-new-btn" onclick="selectAlphabetMode('new')" 
+                        class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-150 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200">
+                        Yangi alifbo (Ö, Ğ, Ş, Ç)
+                    </button>
+                </div>
+            </div>
+
             <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 w-full">
                 
                 <!-- Swap Button (Absolute Center Desktop) -->
@@ -301,6 +316,7 @@
 
         // --- Text Converter Logic ---
         let currentMode = 'kl'; // 'kl' = Kirill to Lotin, 'lk' = Lotin to Kirill
+        let selectedAlphabetMode = 'standard'; // 'standard' or 'new'
         let debounceTimer = null;
         
         const inputArea = document.getElementById('input-text');
@@ -308,6 +324,22 @@
         const inputCount = document.getElementById('char-count');
         const outputCount = document.getElementById('output-char-count');
         
+        function selectAlphabetMode(mode) {
+            selectedAlphabetMode = mode;
+            const stdBtn = document.getElementById('mode-standard-btn');
+            const newBtn = document.getElementById('mode-new-btn');
+            if (mode === 'standard') {
+                stdBtn.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-150 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm";
+                newBtn.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-150 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200";
+            } else {
+                newBtn.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-150 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm";
+                stdBtn.className = "px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-150 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200";
+            }
+            if (inputArea.value.trim() !== '') {
+                triggerConvert();
+            }
+        }
+
         function updateCounts() {
             inputCount.innerText = inputArea.value.length;
             outputCount.innerText = outputArea.value.length;
@@ -370,11 +402,15 @@
             
             overlay.classList.remove('hidden');
             
+            const payload = currentMode === 'kl' 
+                ? { text: text, mode: selectedAlphabetMode }
+                : { text: text };
+
             try {
                 const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
+                    body: JSON.stringify(payload)
                 });
                 if (!res.ok) throw new Error();
                 const data = await res.json();

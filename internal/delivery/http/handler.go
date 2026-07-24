@@ -11,6 +11,7 @@ import (
 
 type ConvertRequest struct {
 	Text string `json:"text"`
+	Mode string `json:"mode"`
 }
 
 type ConvertResponse struct {
@@ -33,7 +34,11 @@ func CyrillicToLatinHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	res := usecase.CyrillicToLatin(req.Text)
+	mode := req.Mode
+	if mode == "" {
+		mode = "standard"
+	}
+	res := usecase.CyrillicToLatin(req.Text, mode)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ConvertResponse{Result: res})
 }

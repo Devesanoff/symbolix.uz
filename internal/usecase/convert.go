@@ -11,8 +11,8 @@ import (
 )
 
 
-func CyrillicToLatin(text string) string {
-	return translator.CyrillicToLatin(text)
+func CyrillicToLatin(text string, alphabetMode string) string {
+	return translator.CyrillicToLatin(text, alphabetMode)
 }
 
 
@@ -52,7 +52,7 @@ func PDFToDocx(pdfStream io.Reader, size int64, translate bool) ([]byte, error) 
 
 	text := totalText.String()
 	if translate {
-		text = translator.CyrillicToLatin(text)
+		text = translator.CyrillicToLatin(text, "standard")
 	}
 
 	return createDocx(text)
